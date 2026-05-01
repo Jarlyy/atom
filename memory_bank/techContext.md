@@ -11,6 +11,7 @@
 - `class-variance-authority`, `clsx`, `tailwind-merge`, `@radix-ui/react-slot` для UI primitives.
 - Bun как пакетный менеджер.
 - Biome для линтинга/форматирования кода, кроме Markdown-файлов. Для CSS включен parser option `tailwindDirectives`.
+- `.gitignore` исключает зависимости, Next.js build/cache, Vercel, env-файлы, временные файлы, логи и локальные IDE/cache артефакты; `bun.lock` должен оставаться в репозитории.
 
 ## Окружение
 
