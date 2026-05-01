@@ -41,6 +41,9 @@ const orbitalColors: Record<SubshellType, string> = {
 };
 
 const orbitalOrder: SubshellType[] = ["s", "p", "d", "f"];
+const levelSpacing = 1.42;
+const orbitalSpacing = 0.11;
+const trackSpacing = 0.04;
 
 export function AtomScene({ element }: AtomSceneProps) {
   return (
@@ -205,7 +208,8 @@ function buildOrbitalTracks(
   levelRadius: number,
 ): OrbitalTrack[] {
   const filledTracks = orbital.orbitals.filter((track) => track.electrons > 0);
-  const baseRadius = levelRadius + orbitalOrder.indexOf(orbital.type) * 0.16;
+  const baseRadius =
+    levelRadius + orbitalOrder.indexOf(orbital.type) * orbitalSpacing;
 
   if (orbital.type === "s") {
     const track = filledTracks[0];
@@ -218,7 +222,7 @@ function buildOrbitalTracks(
   }
 
   return filledTracks.map((track, index) =>
-    createTrack(orbital, track, baseRadius + index * 0.08, index),
+    createTrack(orbital, track, baseRadius + index * trackSpacing, index),
   );
 }
 
@@ -359,7 +363,7 @@ function getTrackPoint(
 }
 
 function getLevelRadius(level: number) {
-  return 1.24 + (level - 1) * 1.18;
+  return 1.2 + (level - 1) * levelSpacing;
 }
 
 function getTrackRotation(
