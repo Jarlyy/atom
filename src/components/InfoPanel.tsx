@@ -28,36 +28,36 @@ export function InfoPanel({ element }: InfoPanelProps) {
   ];
 
   return (
-    <Card className="border-border/80 bg-card/70 shadow-xl backdrop-blur-xl">
-      <CardHeader>
+    <Card className="gap-2 border-border/80 bg-card/70 py-3 shadow-xl backdrop-blur-xl">
+      <CardHeader className="gap-1 px-3">
         <CardDescription className="font-bold tracking-[0.14em] uppercase">
           Selected element
         </CardDescription>
-        <CardTitle className="flex items-end gap-3">
+        <CardTitle className="flex items-end gap-2">
           <span
-            className="grid size-20 place-items-center rounded-2xl border border-primary/40 bg-linear-to-br from-primary/25 to-indigo-500/15 text-4xl font-black"
+            className="grid size-12 place-items-center rounded-xl border border-primary/40 bg-linear-to-br from-primary/25 to-indigo-500/15 text-2xl font-black"
             title={`Symbol ${element.symbol}`}
           >
             {element.symbol}
           </span>
-          <span className="pb-1 text-2xl">{element.name}</span>
+          <span className="pb-1 text-lg">{element.name}</span>
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-2">
-        <div className="rounded-2xl border border-primary/25 bg-primary/10 p-3">
+      <CardContent className="space-y-1.5 px-3">
+        <div className="rounded-xl border border-primary/25 bg-primary/10 p-2">
           <span className="block text-xs text-muted-foreground">
             spdf electron configuration
           </span>
-          <strong className="mt-1 block text-lg tracking-wide">
+          <strong className="mt-1 block text-sm tracking-wide">
             {configuration}
           </strong>
         </div>
-        <div className="rounded-2xl border border-border/80 bg-white/[0.035] p-3">
+        <div className="rounded-xl border border-border/80 bg-white/[0.035] p-2">
           <span className="block text-xs text-muted-foreground">
             Levels and spdf orbitals
           </span>
-          <div className="mt-2 space-y-2">
+          <div className="mt-1 space-y-1">
             {levels.map((level) => (
               <div
                 className="flex flex-wrap items-center gap-2"
@@ -66,7 +66,7 @@ export function InfoPanel({ element }: InfoPanelProps) {
                 <strong className="min-w-12 text-sm">n={level.level}</strong>
                 {level.subshells.map((subshell) => (
                   <span
-                    className="rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-bold text-primary"
+                    className="rounded-full border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[0.66rem] font-bold text-primary"
                     key={subshell.id}
                   >
                     {subshell.id}: {subshell.orbitals.length} track
@@ -78,16 +78,16 @@ export function InfoPanel({ element }: InfoPanelProps) {
             ))}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2 max-[420px]:grid-cols-1">
+        <div className="grid grid-cols-3 gap-1.5 max-[420px]:grid-cols-2">
           {stats.map(([label, value]) => (
             <div
-              className="rounded-2xl border border-border/80 bg-white/[0.035] p-3"
+              className="rounded-xl border border-border/80 bg-white/[0.035] p-2"
               key={label}
             >
               <span className="block text-xs text-muted-foreground">
                 {label}
               </span>
-              <strong className="mt-1 block text-lg">{value}</strong>
+              <strong className="mt-1 block text-sm">{value}</strong>
             </div>
           ))}
         </div>

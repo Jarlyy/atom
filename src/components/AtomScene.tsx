@@ -13,6 +13,8 @@ import {
 
 type AtomSceneProps = {
   element: ChemicalElement;
+  selectedOrbitalId?: string | null;
+  visibleElectrons?: number;
 };
 
 type NucleusProps = {
@@ -21,6 +23,7 @@ type NucleusProps = {
 
 type OrbitalTrack = {
   id: string;
+  orbitalId: string;
   color: string;
   electronCount: number;
   kind: SubshellType;
@@ -45,24 +48,39 @@ const levelSpacing = 1.42;
 const orbitalSpacing = 0.11;
 const trackSpacing = 0.04;
 
-export function AtomScene({ element }: AtomSceneProps) {
+export function AtomScene({
+  element,
+  selectedOrbitalId,
+  visibleElectrons,
+}: AtomSceneProps) {
   return (
-    <div className="min-h-[26rem] flex-1 lg:min-h-[32rem]">
-      <Canvas camera={{ position: [0, 5.2, 10], fov: 45 }}>
+    <div className="min-h-0 flex-1">
+      <Canvas camera={{ position: [0, 6.8, 13.5], fov: 50 }}>
         <color attach="background" args={["#070b16"]} />
         <ambientLight intensity={1.4} />
         <pointLight position={[4, 5, 6]} intensity={24} color="#7dd3fc" />
         <pointLight position={[-5, -3, -4]} intensity={12} color="#fb7185" />
-        <AtomModel element={element} />
-        <OrbitControls enablePan={false} minDistance={5} maxDistance={14} />
+        <AtomModel
+          element={element}
+          selectedOrbitalId={selectedOrbitalId}
+          visibleElectrons={visibleElectrons}
+        />
+        <OrbitControls enablePan={false} minDistance={4.5} maxDistance={24} />
       </Canvas>
     </div>
   );
 }
 
-function AtomModel({ element }: AtomSceneProps) {
+function AtomModel({
+  element,
+  selectedOrbitalId,
+  visibleElectrons,
+}: AtomSceneProps) {
   const groupRef = useRef<Group>(null);
-  const levels = buildElectronLevels(element.electrons);
+  const displayedElectrons = visibleElectrons ?? element.electrons;
+  const levels = buildElectronLevels(displayedElectrons);
+  const activeOrbitalId =
+    selectedOrbitalId ?? getLatestOrbitalId(displayedElectrons);
 
   useFrame((_, delta) => {
     if (!groupRef.current) {
@@ -86,6 +104,7 @@ function AtomModel({ element }: AtomSceneProps) {
                 key={orbital.id}
                 levelRadius={radius}
                 orbital={orbital}
+                selectedOrbitalId={activeOrbitalId}
               />
             ))}
           </group>
@@ -154,18 +173,36 @@ function LevelGuide({ level, radius }: LevelGuideProps) {
 type OrbitalGroupProps = {
   levelRadius: number;
   orbital: ElectronSubshell;
+  selectedOrbitalId?: string | null;
 };
 
-function OrbitalGroup({ levelRadius, orbital }: OrbitalGroupProps) {
+function OrbitalGroup({
+  levelRadius,
+  orbital,
+  selectedOrbitalId,
+}: OrbitalGroupProps) {
   const tracks = buildOrbitalTracks(orbital, levelRadius);
   const color = orbitalColors[orbital.type];
+  const hasSelection = Boolean(selectedOrbitalId);
+  const isSelected = selectedOrbitalId === orbital.id;
 
   return (
     <group>
       {tracks.map((track) => (
-        <ElectronTrack key={track.id} track={track} />
+        <ElectronTrack
+          isDimmed={hasSelection && !isSelected}
+          isSelected={isSelected}
+          key={track.id}
+          track={track}
+        />
       ))}
-      <OrbitalLabel color={color} levelRadius={levelRadius} orbital={orbital} />
+      <OrbitalLabel
+        color={color}
+        isDimmed={hasSelection && !isSelected}
+        isSelected={isSelected}
+        levelRadius={levelRadius}
+        orbital={orbital}
+      />
     </group>
   );
 }
@@ -174,8 +211,12 @@ function OrbitalLabel({
   color,
   levelRadius,
   orbital,
+  isDimmed,
+  isSelected,
 }: {
   color: string;
+  isDimmed: boolean;
+  isSelected: boolean;
   levelRadius: number;
   orbital: ElectronSubshell;
 }) {
@@ -195,7 +236,12 @@ function OrbitalLabel({
     >
       <span
         className="rounded-full border bg-slate-950/75 px-2 py-1 text-[10px] font-black text-white"
-        style={{ borderColor: color, color }}
+        style={{
+          borderColor: color,
+          color,
+          opacity: isDimmed ? 0.32 : 1,
+          transform: isSelected ? "scale(1.12)" : undefined,
+        }}
       >
         {orbital.id}
       </span>
@@ -234,6 +280,7 @@ function createTrack(
 ): OrbitalTrack {
   return {
     id: track.id,
+    orbitalId: orbital.id,
     color: orbitalColors[orbital.type],
     electronCount: track.electrons,
     kind: orbital.type,
@@ -246,21 +293,27 @@ function createTrack(
 }
 
 type ElectronTrackProps = {
+  isDimmed: boolean;
+  isSelected: boolean;
   track: OrbitalTrack;
 };
 
-function ElectronTrack({ track }: ElectronTrackProps) {
+function ElectronTrack({ isDimmed, isSelected, track }: ElectronTrackProps) {
   const curve = useTrackCurve(track);
+  const opacity = isDimmed ? 0.16 : isSelected ? 0.95 : 0.5;
+  const tubeRadius = isSelected ? 0.022 : 0.011;
 
   return (
     <group rotation={track.rotation}>
       <mesh>
-        <tubeGeometry args={[curve, 240, 0.012, 8, true]} />
-        <meshBasicMaterial color={track.color} transparent opacity={0.58} />
+        <tubeGeometry args={[curve, 240, tubeRadius, 8, true]} />
+        <meshBasicMaterial color={track.color} transparent opacity={opacity} />
       </mesh>
       {Array.from({ length: track.electronCount }, (_, electronIndex) => (
         <ElectronOnTrack
           electronIndex={electronIndex}
+          isDimmed={isDimmed}
+          isSelected={isSelected}
           key={electronIndex}
           track={track}
         />
@@ -287,12 +340,24 @@ function useTrackCurve(track: OrbitalTrack) {
 
 type ElectronOnTrackProps = {
   electronIndex: number;
+  isDimmed: boolean;
+  isSelected: boolean;
   track: OrbitalTrack;
 };
 
-function ElectronOnTrack({ electronIndex, track }: ElectronOnTrackProps) {
+function ElectronOnTrack({
+  electronIndex,
+  isDimmed,
+  isSelected,
+  track,
+}: ElectronOnTrackProps) {
   const meshRef = useRef<Group>(null);
   const phase = track.electronCount === 1 ? 0 : electronIndex * Math.PI;
+  const speed = isDimmed
+    ? track.speed * 0.18
+    : isSelected
+      ? track.speed * 1.18
+      : track.speed;
 
   useFrame((state) => {
     if (!meshRef.current) {
@@ -301,7 +366,7 @@ function ElectronOnTrack({ electronIndex, track }: ElectronOnTrackProps) {
 
     const [x, y, z] = getTrackPoint(
       track,
-      state.clock.elapsedTime * track.speed + phase,
+      state.clock.elapsedTime * speed + phase,
     );
 
     meshRef.current.position.set(x, y, z);
@@ -314,8 +379,10 @@ function ElectronOnTrack({ electronIndex, track }: ElectronOnTrackProps) {
         <meshStandardMaterial
           color="#e0f2fe"
           emissive="#06b6d4"
-          emissiveIntensity={0.9}
+          emissiveIntensity={isDimmed ? 0.22 : isSelected ? 1.35 : 0.9}
+          opacity={isDimmed ? 0.35 : 1}
           roughness={0.18}
+          transparent={isDimmed}
         />
       </mesh>
     </group>
@@ -349,8 +416,9 @@ function getTrackPoint(
   }
 
   if (track.kind === "d") {
-    const x = Math.sin(t * 2) * scale * 0.95;
-    const y = Math.sin(t) * Math.cos(t) * scale * 1.1;
+    const cloverRadius = radius * (0.86 + 0.3 * Math.cos(t * 4));
+    const x = Math.cos(t) * cloverRadius;
+    const y = Math.sin(t) * cloverRadius;
 
     return [x, y, 0];
   }
@@ -364,6 +432,13 @@ function getTrackPoint(
 
 function getLevelRadius(level: number) {
   return 1.2 + (level - 1) * levelSpacing;
+}
+
+function getLatestOrbitalId(electronCount: number) {
+  const levels = buildElectronLevels(electronCount);
+  const lastSubshell = levels.at(-1)?.subshells.at(-1);
+
+  return lastSubshell?.id ?? null;
 }
 
 function getTrackRotation(
