@@ -1,0 +1,35 @@
+{
+  "name": "atom-visualizer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome check .",
+    "format": "biome check --write ."
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "latest",
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
+    "@tailwindcss/postcss": "latest",
+    "class-variance-authority": "latest",
+    "clsx": "latest",
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "tailwind-merge": "latest",
+    "tailwindcss": "latest",
+    "three": "latest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/three": "latest",
+    "typescript": "latest"
+  }
+}
