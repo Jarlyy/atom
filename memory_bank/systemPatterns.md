@@ -2,7 +2,7 @@
 
 ## Архитектура
 
-MVP планируется как single-page frontend на Next.js App Router. Backend отсутствует, данные элементов H-Kr поставляются из локального TypeScript-модуля.
+MVP планируется как single-page frontend на Next.js App Router. Backend отсутствует, данные всех элементов H-Og поставляются из локального TypeScript-модуля.
 
 ## Основные модули
 

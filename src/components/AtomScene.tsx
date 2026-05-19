@@ -34,7 +34,7 @@ type OrbitalTrack = {
   speed: number;
 };
 
-const shellNames = ["K", "L", "M", "N"];
+const shellNames = ["K", "L", "M", "N", "O", "P", "Q"];
 
 const orbitalColors: Record<SubshellType, string> = {
   s: "#67e8f9",
@@ -44,7 +44,7 @@ const orbitalColors: Record<SubshellType, string> = {
 };
 
 const orbitalOrder: SubshellType[] = ["s", "p", "d", "f"];
-const levelSpacing = 1.42;
+const levelSpacing = 1.16;
 const orbitalSpacing = 0.11;
 const trackSpacing = 0.04;
 
@@ -65,7 +65,7 @@ export function AtomScene({
           selectedOrbitalId={selectedOrbitalId}
           visibleElectrons={visibleElectrons}
         />
-        <OrbitControls enablePan={false} minDistance={4.5} maxDistance={24} />
+        <OrbitControls enablePan={false} minDistance={4.5} maxDistance={32} />
       </Canvas>
     </div>
   );
