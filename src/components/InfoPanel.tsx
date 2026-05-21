@@ -28,23 +28,23 @@ export function InfoPanel({ element }: InfoPanelProps) {
   ];
 
   return (
-    <Card className="gap-2 border-border/80 bg-card/70 py-3 shadow-xl backdrop-blur-xl">
-      <CardHeader className="gap-1 px-3">
+    <Card className="gap-2 border-border/80 bg-card/70 py-2 shadow-xl backdrop-blur-xl">
+      <CardHeader className="gap-1 px-3 py-0">
         <CardDescription className="font-bold tracking-[0.14em] uppercase">
           Selected element
         </CardDescription>
-        <CardTitle className="flex items-end gap-2">
+        <CardTitle className="flex items-center gap-2">
           <span
-            className="grid size-12 place-items-center rounded-xl border border-primary/40 bg-linear-to-br from-primary/25 to-indigo-500/15 text-2xl font-black"
+            className="grid size-10 shrink-0 place-items-center rounded-xl border border-primary/40 bg-linear-to-br from-primary/25 to-indigo-500/15 text-xl font-black"
             title={`Symbol ${element.symbol}`}
           >
             {element.symbol}
           </span>
-          <span className="pb-1 text-lg">{element.name}</span>
+          <span className="truncate text-lg">{element.name}</span>
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-1.5 px-3">
+      <CardContent className="space-y-1.5 px-3 pb-3">
         <div className="rounded-xl border border-primary/25 bg-primary/10 p-2">
           <span className="block text-xs text-muted-foreground">
             spdf electron configuration

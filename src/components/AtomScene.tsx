@@ -24,6 +24,7 @@ type NucleusProps = {
 type OrbitalTrack = {
   id: string;
   orbitalId: string;
+  label: string;
   color: string;
   electronCount: number;
   kind: SubshellType;
@@ -92,8 +93,7 @@ function AtomModel({
   const groupRef = useRef<Group>(null);
   const displayedElectrons = visibleElectrons ?? element.electrons;
   const levels = buildElectronLevels(displayedElectrons);
-  const activeOrbitalId =
-    selectedOrbitalId ?? getLatestOrbitalId(displayedElectrons);
+  const activeOrbitalId = selectedOrbitalId ?? null;
 
   useFrame((_, delta) => {
     if (!groupRef.current) {
@@ -197,22 +197,33 @@ function OrbitalGroup({
   const tracks = buildOrbitalTracks(orbital, levelRadius);
   const color = orbitalColors[orbital.type];
   const hasSelection = Boolean(selectedOrbitalId);
-  const isSelected = selectedOrbitalId === orbital.id;
+  const isSubshellSelected = selectedOrbitalId === orbital.id;
+  const hasSelectedTrack = tracks.some(
+    (track) => track.id === selectedOrbitalId,
+  );
+  const isGroupSelected = isSubshellSelected || hasSelectedTrack;
 
   return (
     <group>
-      {tracks.map((track) => (
-        <ElectronTrack
-          isDimmed={hasSelection && !isSelected}
-          isSelected={isSelected}
-          key={track.id}
-          track={track}
-        />
-      ))}
+      {tracks.map((track) => {
+        const isTrackSelected = selectedOrbitalId === track.id;
+        const isSelected = isSubshellSelected || isTrackSelected;
+
+        return (
+          <ElectronTrack
+            hasFocus={hasSelection}
+            isDimmed={hasSelection && !isSelected}
+            isSelected={isSelected}
+            key={track.id}
+            showLabel={isTrackSelected}
+            track={track}
+          />
+        );
+      })}
       <OrbitalLabel
         color={color}
-        isDimmed={hasSelection && !isSelected}
-        isSelected={isSelected}
+        isDimmed={hasSelection && !isGroupSelected}
+        isSelected={isGroupSelected}
         levelRadius={levelRadius}
         orbital={orbital}
       />
@@ -294,6 +305,7 @@ function createTrack(
   return {
     id: track.id,
     orbitalId: orbital.id,
+    label: getTrackLabel(orbital.type, orbital.level, index),
     color: orbitalColors[orbital.type],
     electronCount: track.electrons,
     kind: orbital.type,
@@ -306,12 +318,20 @@ function createTrack(
 }
 
 type ElectronTrackProps = {
+  hasFocus: boolean;
   isDimmed: boolean;
   isSelected: boolean;
+  showLabel: boolean;
   track: OrbitalTrack;
 };
 
-function ElectronTrack({ isDimmed, isSelected, track }: ElectronTrackProps) {
+function ElectronTrack({
+  hasFocus,
+  isDimmed,
+  isSelected,
+  showLabel,
+  track,
+}: ElectronTrackProps) {
   const curve = useTrackCurve(track);
   const opacity = isDimmed ? 0.16 : isSelected ? 0.95 : 0.5;
   const tubeRadius = isSelected ? 0.022 : 0.011;
@@ -325,13 +345,30 @@ function ElectronTrack({ isDimmed, isSelected, track }: ElectronTrackProps) {
       {Array.from({ length: track.electronCount }, (_, electronIndex) => (
         <ElectronOnTrack
           electronIndex={electronIndex}
+          hasFocus={hasFocus}
           isDimmed={isDimmed}
           isSelected={isSelected}
           key={electronIndex}
           track={track}
         />
       ))}
+      {showLabel ? <TrackLabel track={track} /> : null}
     </group>
+  );
+}
+
+function TrackLabel({ track }: { track: OrbitalTrack }) {
+  const [x, y, z] = getTrackPoint(track, Math.PI / 4);
+
+  return (
+    <Html center distanceFactor={8} position={[x, y + 0.18, z]}>
+      <span
+        className="rounded-full border bg-slate-950/80 px-2 py-1 text-[10px] font-black text-white"
+        style={{ borderColor: track.color, color: track.color }}
+      >
+        {track.label}
+      </span>
+    </Html>
   );
 }
 
@@ -353,6 +390,7 @@ function useTrackCurve(track: OrbitalTrack) {
 
 type ElectronOnTrackProps = {
   electronIndex: number;
+  hasFocus: boolean;
   isDimmed: boolean;
   isSelected: boolean;
   track: OrbitalTrack;
@@ -360,6 +398,7 @@ type ElectronOnTrackProps = {
 
 function ElectronOnTrack({
   electronIndex,
+  hasFocus,
   isDimmed,
   isSelected,
   track,
@@ -370,7 +409,9 @@ function ElectronOnTrack({
     ? track.speed * 0.18
     : isSelected
       ? track.speed * 1.18
-      : track.speed;
+      : hasFocus
+        ? track.speed
+        : track.speed * 0.42;
 
   useFrame((state) => {
     if (!meshRef.current) {
@@ -440,6 +481,26 @@ function getTrackPoint(
     radius,
     t,
   );
+}
+
+function getTrackLabel(type: SubshellType, level: number, index: number) {
+  if (type === "s") {
+    return `${level}s`;
+  }
+
+  if (type === "p") {
+    return `${level}p${["x", "y", "z"][index % 3]}`;
+  }
+
+  if (type === "d") {
+    const labels = ["xy", "yz", "xz", "x²-y²", "z²"];
+
+    return `${level}d${labels[index % labels.length]}`;
+  }
+
+  const labels = ["z³", "xz²", "yz²", "z(x²-y²)", "xyz", "x³", "y³"];
+
+  return `${level}f${labels[index % labels.length]}`;
 }
 
 function getDOrbitalPoint(
@@ -530,13 +591,6 @@ function getFOrbitalPoint(
 
 function getLevelRadius(level: number) {
   return 1.2 + (level - 1) * levelSpacing;
-}
-
-function getLatestOrbitalId(electronCount: number) {
-  const levels = buildElectronLevels(electronCount);
-  const lastSubshell = levels.at(-1)?.subshells.at(-1);
-
-  return lastSubshell?.id ?? null;
 }
 
 function getTrackRotation(

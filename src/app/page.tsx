@@ -80,7 +80,7 @@ export default function Home() {
             </Button>
           </CardContent>
         </Card>
-        <div className="min-h-0 overflow-hidden">
+        <div className="min-h-0 overflow-auto pr-1">
           <InfoPanel element={selectedElement} />
         </div>
         <OrbitalFocusPanel
