@@ -68,8 +68,8 @@ export function AtomScene({
   visibleElectrons,
 }: AtomSceneProps) {
   return (
-    <div className="min-h-0 flex-1">
-      <Canvas camera={{ position: [0, 6.8, 13.5], fov: 50 }}>
+    <div className="h-full min-h-0 w-full flex-1">
+      <Canvas camera={{ position: [0, 3.8, 14.5], fov: 50 }}>
         <color attach="background" args={["#070b16"]} />
         <ambientLight intensity={1.4} />
         <pointLight position={[4, 5, 6]} intensity={24} color="#7dd3fc" />
@@ -175,7 +175,7 @@ function LevelGuide({ level, radius }: LevelGuideProps) {
         <meshBasicMaterial color="#38bdf8" transparent opacity={0.18} />
       </mesh>
       <Html center distanceFactor={8} position={[radius + 0.2, 0.12, 0]}>
-        <span className="rounded-full border border-sky-300/20 bg-slate-950/75 px-2 py-1 text-[10px] font-bold text-sky-100">
+        <span className="inline-flex whitespace-nowrap rounded-full border border-sky-300/20 bg-slate-950/75 px-2.5 py-1 text-[10px] leading-none font-bold text-sky-100">
           {shellNames[level - 1] ?? `n${level}`} / n={level}
         </span>
       </Html>

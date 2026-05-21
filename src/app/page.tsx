@@ -1,5 +1,6 @@
 "use client";
 
+import { Maximize2, Minimize2 } from "lucide-react";
 import { useState } from "react";
 import { AtomScene } from "@/components/AtomScene";
 import { ElementSelector } from "@/components/ElementSelector";
@@ -21,6 +22,7 @@ export default function Home() {
     defaultElement.electrons,
   );
   const [isElementSelectorOpen, setIsElementSelectorOpen] = useState(false);
+  const [isAtomFullscreen, setIsAtomFullscreen] = useState(false);
 
   function handleSelectElement(element: typeof selectedElement) {
     setSelectedElement(element);
@@ -35,7 +37,7 @@ export default function Home() {
         aria-label="3D визуализация атома"
       >
         <CardHeader className="flex flex-row items-start justify-between gap-3 px-4 pt-4 md:px-5">
-          <div>
+          <div className="min-w-0">
             <p className="mb-1 text-xs font-bold tracking-[0.16em] text-primary uppercase">
               Interactive Atom Visualizer
             </p>
@@ -43,11 +45,20 @@ export default function Home() {
               {selectedElement.name}
             </h1>
           </div>
-          <Badge className="rounded-full border-primary/30 bg-primary/10 px-4 py-2 text-sm font-black text-primary">
+          <Badge className="shrink-0 rounded-full border-primary/30 bg-primary/10 px-4 py-2 text-sm font-black text-primary">
             #{selectedElement.atomicNumber}
           </Badge>
         </CardHeader>
-        <CardContent className="flex min-h-0 flex-1 px-0 pb-0">
+        <CardContent className="relative flex min-h-0 flex-1 px-0 pb-0">
+          <Button
+            aria-label="Open fullscreen atom view"
+            className="absolute top-3 right-3 z-10 size-10 rounded-full border-primary/25 bg-slate-950/55 p-0 text-primary shadow-xl backdrop-blur-md hover:bg-slate-950/75"
+            onClick={() => setIsAtomFullscreen(true)}
+            type="button"
+            variant="outline"
+          >
+            <Maximize2 className="size-4" />
+          </Button>
           <AtomScene
             element={selectedElement}
             selectedOrbitalId={selectedOrbitalId}
@@ -98,6 +109,24 @@ export default function Home() {
         selectedElement={selectedElement}
         onSelect={handleSelectElement}
       />
+      {isAtomFullscreen ? (
+        <div className="fixed inset-0 z-50 bg-slate-950">
+          <Button
+            aria-label="Exit fullscreen atom view"
+            className="absolute top-4 right-4 z-10 size-11 rounded-full border-primary/25 bg-slate-950/55 p-0 text-primary shadow-xl backdrop-blur-md hover:bg-slate-950/75"
+            onClick={() => setIsAtomFullscreen(false)}
+            type="button"
+            variant="outline"
+          >
+            <Minimize2 className="size-4" />
+          </Button>
+          <AtomScene
+            element={selectedElement}
+            selectedOrbitalId={selectedOrbitalId}
+            visibleElectrons={visibleElectrons}
+          />
+        </div>
+      ) : null}
     </main>
   );
 }
