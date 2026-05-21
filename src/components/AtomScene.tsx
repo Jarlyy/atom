@@ -50,13 +50,13 @@ const orbitalSpacing = 0.11;
 const trackSpacing = 0.04;
 const dOrbitalVariants = ["dxy", "dyz", "dxz", "dx2y2", "dz2"] as const;
 const fOrbitalVariants = [
-  "fz3",
+  "fxyz",
+  "fzx2y2",
+  "fxx23y2",
+  "fy3x2y2",
   "fxz2",
   "fyz2",
-  "fzx2y2",
-  "fxyz",
-  "fx3",
-  "fy3",
+  "fz3",
 ] as const;
 
 type DOrbitalVariant = (typeof dOrbitalVariants)[number];
@@ -377,14 +377,14 @@ function useTrackCurve(track: OrbitalTrack) {
     const points: Vector3[] = [];
     const segments = 240;
 
-    for (let index = 0; index < segments; index += 1) {
+    for (let index = 0; index <= segments; index += 1) {
       const t = (index / segments) * Math.PI * 2;
       const [x, y, z] = getTrackPoint(track, t);
 
       points.push(new Vector3(x, y, z));
     }
 
-    return new CatmullRomCurve3(points, true);
+    return new CatmullRomCurve3(points, false);
   }, [track]);
 }
 
@@ -498,7 +498,15 @@ function getTrackLabel(type: SubshellType, level: number, index: number) {
     return `${level}d${labels[index % labels.length]}`;
   }
 
-  const labels = ["z³", "xz²", "yz²", "z(x²-y²)", "xyz", "x³", "y³"];
+  const labels = [
+    "xyz",
+    "z(x²-y²)",
+    "x(x²-3y²)",
+    "y(3x²-y²)",
+    "xz²",
+    "yz²",
+    "z³",
+  ];
 
   return `${level}f${labels[index % labels.length]}`;
 }
@@ -547,46 +555,108 @@ function getFOrbitalPoint(
   radius: number,
   t: number,
 ): [number, number, number] {
+  if (variant === "fxx23y2") {
+    return getPlanarHarmonicPoint(radius, t, 0);
+  }
+
+  if (variant === "fy3x2y2") {
+    return getPlanarHarmonicPoint(radius, t, Math.PI / 6);
+  }
+
   if (variant === "fz3") {
-    const z = Math.cos(t) * radius * 1.12;
-    const waist = Math.sin(t);
-    const ringRadius =
-      radius * 0.3 * Math.abs(waist) * (0.65 + 0.35 * Math.cos(t * 2));
-    const ringPhase = t * 3;
-
-    return [
-      Math.cos(ringPhase) * ringRadius,
-      Math.sin(ringPhase) * ringRadius,
-      z,
-    ];
+    return getZ3HarmonicPoint(radius, t);
   }
 
-  const lobeRadius = radius * Math.sin(t * 3);
-  const x = Math.cos(t) * lobeRadius;
-  const y = Math.sin(t) * lobeRadius;
-  const z = Math.sin(t * 2) * radius * 0.34;
+  const direction = getFHarmonicDirection(variant, t);
+  const magnitude = getNormalizedFHarmonicMagnitude(variant, direction);
+  const pathRadius = radius * (0.32 + magnitude * 0.9);
 
-  if (variant === "fxz2") {
-    return [x, z * 0.46, y];
+  return [
+    direction[0] * pathRadius,
+    direction[1] * pathRadius,
+    direction[2] * pathRadius,
+  ];
+}
+
+function getPlanarHarmonicPoint(
+  radius: number,
+  t: number,
+  phase: number,
+): [number, number, number] {
+  const angle = t + phase;
+  const harmonicRadius = radius * (0.28 + 0.72 * Math.abs(Math.cos(3 * angle)));
+  const ripple = Math.sin(6 * angle) * radius * 0.035;
+
+  return [
+    Math.cos(angle) * harmonicRadius,
+    Math.sin(angle) * harmonicRadius,
+    ripple,
+  ];
+}
+
+function getZ3HarmonicPoint(
+  radius: number,
+  t: number,
+): [number, number, number] {
+  const vertical = Math.cos(t);
+  const harmonic = Math.abs(vertical * (5 * vertical * vertical - 3)) / 2;
+  const z = vertical * radius * (0.88 + harmonic * 0.2);
+  const waist = Math.sin(t);
+  const ringRadius =
+    radius * (0.16 + 0.22 * Math.abs(waist)) * (0.72 + 0.28 * harmonic);
+  const ringPhase = t * 2;
+
+  return [
+    Math.cos(ringPhase) * ringRadius,
+    Math.sin(ringPhase) * ringRadius,
+    z,
+  ];
+}
+
+function getFHarmonicDirection(
+  variant: FOrbitalVariant,
+  t: number,
+): [number, number, number] {
+  if (variant === "fxz2" || variant === "fyz2") {
+    const z = Math.sin(t);
+    const planeRadius = Math.sqrt(Math.max(0, 1 - z * z));
+
+    if (variant === "fxz2") {
+      return [Math.cos(t) * planeRadius, 0, z];
+    }
+
+    return [0, Math.cos(t) * planeRadius, z];
   }
 
-  if (variant === "fyz2") {
-    return [z * 0.46, x, y];
+  const z = Math.sin(t * 4) * 0.62;
+  const planeRadius = Math.sqrt(Math.max(0, 1 - z * z));
+  const x = Math.cos(t) * planeRadius;
+  const y = Math.sin(t) * planeRadius;
+
+  return [x, y, z];
+}
+
+function getNormalizedFHarmonicMagnitude(
+  variant: FOrbitalVariant,
+  [x, y, z]: [number, number, number],
+) {
+  if (variant === "fxyz") {
+    return Math.min(1, Math.abs(x * y * z) * 5.2);
   }
 
   if (variant === "fzx2y2") {
-    return [x, y, z];
+    return Math.min(1, Math.abs(z * (x * x - y * y)) * 3.0);
   }
 
-  if (variant === "fxyz") {
-    return [x, y, Math.sin(t * 4) * radius * 0.22];
+  if (variant === "fxz2") {
+    return Math.min(1, Math.abs(x * (5 * z * z - 1)) * 0.68);
   }
 
-  if (variant === "fx3") {
-    return [y, z, x];
+  if (variant === "fyz2") {
+    return Math.min(1, Math.abs(y * (5 * z * z - 1)) * 0.68);
   }
 
-  return [z, y, x];
+  return 1;
 }
 
 function getLevelRadius(level: number) {
@@ -609,15 +679,9 @@ function getTrackRotation(
     return [0, 0, 0];
   }
 
-  const fRotations: Array<[number, number, number]> = [
-    [0, 0, 0],
-    [0.14, 0, 0],
-    [0, 0.14, 0],
-    [0, 0, Math.PI / 4],
-    [Math.PI / 5, Math.PI / 5, 0],
-    [0, Math.PI / 2, 0],
-    [Math.PI / 2, 0, 0],
-  ];
+  if (index === 3) {
+    return [0, 0, Math.PI / 6];
+  }
 
-  return fRotations[index % fRotations.length];
+  return [0, 0, 0];
 }

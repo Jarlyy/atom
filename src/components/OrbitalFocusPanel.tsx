@@ -26,7 +26,7 @@ const trackLabels: Record<SubshellType, string[]> = {
   s: ["s"],
   p: ["px", "py", "pz"],
   d: ["dxy", "dyz", "dxz", "dx²-y²", "dz²"],
-  f: ["fz³", "fxz²", "fyz²", "fz(x²-y²)", "fxyz", "fx³", "fy³"],
+  f: ["fxyz", "fz(x²-y²)", "fx(x²-3y²)", "fy(3x²-y²)", "fxz²", "fyz²", "fz³"],
 };
 
 type OrbitalOption = {
