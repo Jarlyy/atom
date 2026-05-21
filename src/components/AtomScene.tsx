@@ -47,6 +47,19 @@ const orbitalOrder: SubshellType[] = ["s", "p", "d", "f"];
 const levelSpacing = 1.16;
 const orbitalSpacing = 0.11;
 const trackSpacing = 0.04;
+const dOrbitalVariants = ["dxy", "dyz", "dxz", "dx2y2", "dz2"] as const;
+const fOrbitalVariants = [
+  "fz3",
+  "fxz2",
+  "fyz2",
+  "fzx2y2",
+  "fxyz",
+  "fx3",
+  "fy3",
+] as const;
+
+type DOrbitalVariant = (typeof dOrbitalVariants)[number];
+type FOrbitalVariant = (typeof fOrbitalVariants)[number];
 
 export function AtomScene({
   element,
@@ -394,7 +407,6 @@ function getTrackPoint(
   t: number,
 ): [number, number, number] {
   const radius = track.radius;
-  const scale = radius * 0.46;
 
   if (track.kind === "s") {
     return [Math.cos(t) * radius, Math.sin(t) * radius, 0];
@@ -416,18 +428,104 @@ function getTrackPoint(
   }
 
   if (track.kind === "d") {
-    const cloverRadius = radius * (0.86 + 0.3 * Math.cos(t * 4));
-    const x = Math.cos(t) * cloverRadius;
-    const y = Math.sin(t) * cloverRadius;
+    return getDOrbitalPoint(
+      dOrbitalVariants[track.orbitalIndex % dOrbitalVariants.length],
+      radius,
+      t,
+    );
+  }
 
+  return getFOrbitalPoint(
+    fOrbitalVariants[track.orbitalIndex % fOrbitalVariants.length],
+    radius,
+    t,
+  );
+}
+
+function getDOrbitalPoint(
+  variant: DOrbitalVariant,
+  radius: number,
+  t: number,
+): [number, number, number] {
+  if (variant === "dz2") {
+    const z = Math.cos(t) * radius * 1.08;
+    const waist = Math.sin(t);
+    const ringRadius = radius * 0.24 * Math.abs(waist);
+    const ringPhase = t * 3;
+
+    return [
+      Math.cos(ringPhase) * ringRadius,
+      Math.sin(ringPhase) * ringRadius,
+      z,
+    ];
+  }
+
+  const cloverRadius = radius * Math.sin(t * 2);
+  const x = Math.cos(t) * cloverRadius;
+  const y = Math.sin(t) * cloverRadius;
+
+  if (variant === "dxy") {
     return [x, y, 0];
   }
 
-  const x = Math.sin(t * 3) * scale * 0.9;
-  const y = Math.sin(t * 2) * scale * 0.78;
-  const z = Math.cos(t) * scale * 0.22;
+  if (variant === "dyz") {
+    return [0, x, y];
+  }
 
-  return [x, y, z];
+  if (variant === "dxz") {
+    return [x, 0, y];
+  }
+
+  const diagonal = Math.SQRT1_2;
+
+  return [(x - y) * diagonal, (x + y) * diagonal, 0];
+}
+
+function getFOrbitalPoint(
+  variant: FOrbitalVariant,
+  radius: number,
+  t: number,
+): [number, number, number] {
+  if (variant === "fz3") {
+    const z = Math.cos(t) * radius * 1.12;
+    const waist = Math.sin(t);
+    const ringRadius =
+      radius * 0.3 * Math.abs(waist) * (0.65 + 0.35 * Math.cos(t * 2));
+    const ringPhase = t * 3;
+
+    return [
+      Math.cos(ringPhase) * ringRadius,
+      Math.sin(ringPhase) * ringRadius,
+      z,
+    ];
+  }
+
+  const lobeRadius = radius * Math.sin(t * 3);
+  const x = Math.cos(t) * lobeRadius;
+  const y = Math.sin(t) * lobeRadius;
+  const z = Math.sin(t * 2) * radius * 0.34;
+
+  if (variant === "fxz2") {
+    return [x, z * 0.46, y];
+  }
+
+  if (variant === "fyz2") {
+    return [z * 0.46, x, y];
+  }
+
+  if (variant === "fzx2y2") {
+    return [x, y, z];
+  }
+
+  if (variant === "fxyz") {
+    return [x, y, Math.sin(t * 4) * radius * 0.22];
+  }
+
+  if (variant === "fx3") {
+    return [y, z, x];
+  }
+
+  return [z, y, x];
 }
 
 function getLevelRadius(level: number) {
@@ -454,16 +552,18 @@ function getTrackRotation(
   }
 
   if (type === "d") {
-    const rotations: Array<[number, number, number]> = [
-      [0, 0, 0],
-      [0.16, Math.PI / 5, 0],
-      [-0.16, (Math.PI * 2) / 5, 0],
-      [0.24, (Math.PI * 3) / 5, 0],
-      [-0.24, (Math.PI * 4) / 5, 0],
-    ];
-
-    return rotations[index % rotations.length];
+    return [0, 0, 0];
   }
 
-  return [index % 2 === 0 ? 0.2 : -0.2, index * 0.42, 0];
+  const fRotations: Array<[number, number, number]> = [
+    [0, 0, 0],
+    [0.14, 0, 0],
+    [0, 0.14, 0],
+    [0, 0, Math.PI / 4],
+    [Math.PI / 5, Math.PI / 5, 0],
+    [0, Math.PI / 2, 0],
+    [Math.PI / 2, 0, 0],
+  ];
+
+  return fRotations[index % fRotations.length];
 }
