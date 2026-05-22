@@ -39,23 +39,23 @@ export default function Home() {
 
   return (
     <main
-      className="grid h-screen overflow-hidden p-2 md:p-3 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-3"
+      className="grid min-h-dvh gap-3 overflow-x-hidden p-2 md:p-3 lg:h-screen lg:grid-cols-[minmax(0,1fr)_23rem] lg:overflow-hidden"
       suppressHydrationWarning
     >
       <Card
-        className="min-h-0 overflow-hidden rounded-[1.6rem] border-border/80 bg-card/80 py-0 shadow-2xl backdrop-blur-xl"
+        className="min-h-[58dvh] overflow-hidden rounded-[1.25rem] border-border/80 bg-card/80 py-0 shadow-2xl backdrop-blur-xl md:min-h-[64dvh] md:rounded-[1.6rem] lg:min-h-0"
         aria-label="3D визуализация атома"
       >
-        <CardHeader className="flex flex-row items-start justify-between gap-3 px-4 pt-4 md:px-5">
+        <CardHeader className="flex flex-row items-start justify-between gap-3 px-3 pt-3 md:px-5 md:pt-4">
           <div className="min-w-0">
-            <p className="mb-1 text-xs font-bold tracking-[0.16em] text-primary uppercase">
+            <p className="mb-1 text-[0.62rem] font-bold tracking-[0.14em] text-primary uppercase md:text-xs md:tracking-[0.16em]">
               {t(language, "appTitle")}
             </p>
-            <h1 className="text-3xl leading-none font-black tracking-tight md:text-5xl xl:text-6xl">
+            <h1 className="truncate text-3xl leading-none font-black tracking-tight md:text-5xl xl:text-6xl">
               {selectedElementName}
             </h1>
           </div>
-          <Badge className="shrink-0 rounded-full border-primary/30 bg-primary/10 px-4 py-2 text-sm font-black text-primary">
+          <Badge className="shrink-0 rounded-full border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-black text-primary md:px-4 md:py-2 md:text-sm">
             #{selectedElement.atomicNumber}
           </Badge>
         </CardHeader>
@@ -78,13 +78,13 @@ export default function Home() {
       </Card>
 
       <aside
-        className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-2 overflow-hidden rounded-3xl border border-border/80 bg-card/70 p-2 shadow-2xl backdrop-blur-xl"
+        className="grid min-h-0 gap-2 rounded-3xl border border-border/80 bg-card/70 p-2 shadow-2xl backdrop-blur-xl lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:overflow-hidden"
         aria-label="Информация и выбор элемента"
       >
         <Card className="gap-2 border-border/80 bg-card/70 py-3 shadow-xl backdrop-blur-xl">
           <CardContent className="space-y-3 px-3">
-            <div className="flex items-center justify-between gap-3">
-              <div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <span className="block text-xs font-bold tracking-[0.14em] text-muted-foreground uppercase">
                   {t(language, "periodicTable")}
                 </span>
@@ -94,7 +94,7 @@ export default function Home() {
                 </span>
               </div>
               <Button
-                className="rounded-full"
+                className="w-full rounded-full sm:w-auto"
                 onClick={() => setIsElementSelectorOpen(true)}
                 type="button"
               >
@@ -128,7 +128,7 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
-        <div className="min-h-0 overflow-auto pr-1">
+        <div className="min-h-0 lg:overflow-auto lg:pr-1">
           <InfoPanel element={selectedElement} language={language} />
         </div>
         <OrbitalFocusPanel
