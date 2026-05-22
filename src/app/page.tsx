@@ -174,42 +174,24 @@ export default function Home() {
 
 function MaximizeIcon() {
   return (
-    <svg
+    <span
       aria-hidden="true"
-      className="size-4"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
+      className="relative block size-4 before:absolute before:top-0 before:right-0 before:size-2 before:border-t-2 before:border-r-2 before:border-current after:absolute after:bottom-0 after:left-0 after:size-2 after:border-b-2 after:border-l-2 after:border-current"
     >
-      <path d="M15 3h6v6" />
-      <path d="m21 3-7 7" />
-      <path d="m3 21 7-7" />
-      <path d="M9 21H3v-6" />
-    </svg>
+      <span className="absolute top-0 right-0 h-2 w-px origin-top translate-x-[-0.35rem] rotate-45 bg-current" />
+      <span className="absolute bottom-0 left-0 h-2 w-px origin-bottom translate-x-[0.35rem] rotate-45 bg-current" />
+    </span>
   );
 }
 
 function MinimizeIcon() {
   return (
-    <svg
+    <span
       aria-hidden="true"
-      className="size-4"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
+      className="relative block size-4 before:absolute before:top-1 before:left-1 before:size-1.5 before:border-t-2 before:border-l-2 before:border-current after:absolute after:right-1 after:bottom-1 after:size-1.5 after:border-r-2 after:border-b-2 after:border-current"
     >
-      <path d="m14 10 7-7" />
-      <path d="M20 10h-6V4" />
-      <path d="m3 21 7-7" />
-      <path d="M4 14h6v6" />
-    </svg>
+      <span className="absolute top-1 left-1 h-2 w-px origin-top translate-x-[0.45rem] rotate-45 bg-current" />
+      <span className="absolute right-1 bottom-1 h-2 w-px origin-bottom translate-x-[-0.45rem] rotate-45 bg-current" />
+    </span>
   );
 }
