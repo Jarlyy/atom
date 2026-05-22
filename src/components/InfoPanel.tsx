@@ -10,44 +10,54 @@ import {
   buildElectronLevels,
   formatElectronConfiguration,
 } from "@/lib/electronConfiguration";
+import {
+  formatTranslation,
+  getElementName,
+  type Language,
+  t,
+} from "@/lib/i18n";
 
 type InfoPanelProps = {
   element: ChemicalElement;
+  language: Language;
 };
 
-export function InfoPanel({ element }: InfoPanelProps) {
+export function InfoPanel({ element, language }: InfoPanelProps) {
   const configuration = formatElectronConfiguration(element.electrons);
   const levels = buildElectronLevels(element.electrons);
+  const elementName = getElementName(element, language);
   const stats = [
-    ["Name", element.name],
-    ["Atomic number", element.atomicNumber],
-    ["Protons", element.protons],
-    ["Neutrons", element.neutrons],
-    ["Electrons", element.electrons],
-    ["Levels", element.shells.join(", ")],
+    [t(language, "stats.name"), elementName],
+    [t(language, "stats.atomicNumber"), element.atomicNumber],
+    [t(language, "stats.protons"), element.protons],
+    [t(language, "stats.neutrons"), element.neutrons],
+    [t(language, "stats.electrons"), element.electrons],
+    [t(language, "stats.levels"), element.shells.join(", ")],
   ];
 
   return (
     <Card className="gap-2 border-border/80 bg-card/70 py-2 shadow-xl backdrop-blur-xl">
       <CardHeader className="gap-1 px-3 py-0">
         <CardDescription className="font-bold tracking-[0.14em] uppercase">
-          Selected element
+          {t(language, "infoPanel.selectedElement")}
         </CardDescription>
         <CardTitle className="flex items-center gap-2">
           <span
             className="grid size-10 shrink-0 place-items-center rounded-xl border border-primary/40 bg-linear-to-br from-primary/25 to-indigo-500/15 text-xl font-black"
-            title={`Symbol ${element.symbol}`}
+            title={formatTranslation(language, "symbolTitle", {
+              symbol: element.symbol,
+            })}
           >
             {element.symbol}
           </span>
-          <span className="truncate text-lg">{element.name}</span>
+          <span className="truncate text-lg">{elementName}</span>
         </CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-1.5 px-3 pb-3">
         <div className="rounded-xl border border-primary/25 bg-primary/10 p-2">
           <span className="block text-xs text-muted-foreground">
-            spdf electron configuration
+            {t(language, "infoPanel.configuration")}
           </span>
           <strong className="mt-1 block text-sm tracking-wide">
             {configuration}
@@ -55,7 +65,7 @@ export function InfoPanel({ element }: InfoPanelProps) {
         </div>
         <div className="rounded-xl border border-border/80 bg-white/[0.035] p-2">
           <span className="block text-xs text-muted-foreground">
-            Levels and spdf orbitals
+            {t(language, "infoPanel.levelsAndOrbitals")}
           </span>
           <div className="mt-1 space-y-1">
             {levels.map((level) => (
@@ -69,9 +79,12 @@ export function InfoPanel({ element }: InfoPanelProps) {
                     className="rounded-full border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[0.66rem] font-bold text-primary"
                     key={subshell.id}
                   >
-                    {subshell.id}: {subshell.orbitals.length} track
-                    {subshell.orbitals.length > 1 ? "s" : ""},{" "}
-                    {subshell.electrons}e
+                    {subshell.id}: {subshell.orbitals.length}{" "}
+                    {t(
+                      language,
+                      subshell.orbitals.length > 1 ? "tracks" : "track",
+                    )}
+                    , {subshell.electrons}e
                   </span>
                 ))}
               </div>
