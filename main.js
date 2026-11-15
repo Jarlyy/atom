@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import {elements} from './data.js';
 //initial setup
 const mycanvas = document.querySelector('#canvas');
 const wraper = mycanvas.parentElement;
@@ -213,65 +214,65 @@ function getRandomInt(min, max) {
 let orbitals_list = new Map();
 
 
-const electron_configurations = {
-    H: `
-        <span class="orbital-clickable" data-orbital="1s1">1s<sup>1</sup></span>
-    `,
-    He: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span>
-    `,
-    Li: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s1">2s<sup>1</sup></span>
-    `,
-    Be: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span>
-    `,
-    B: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p1">2p<sup>1</sup></span>
-    `,
-    C: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p2">2p<sup>2</sup></span>
-    `,
-    N: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p3">2p<sup>3</sup></span>
-    `,
-    O: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p4">2p<sup>4</sup></span>
-    `,
-    F: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p5">2p<sup>5</sup></span>
-    `,
-    Ne: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p6">2p<sup>6</sup></span>
-    `,
-    Na: `
-        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p6">2p<sup>6</sup></span> 
-        <span class="orbital-clickable" data-orbital="3s1">3s<sup>1</sup></span>
-    `
-};
+// const electron_configurations = {
+//     H: `
+//         <span class="orbital-clickable" data-orbital="1s1">1s<sup>1</sup></span>
+//     `,
+//     He: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span>
+//     `,
+//     Li: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s1">2s<sup>1</sup></span>
+//     `,
+//     Be: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span>
+//     `,
+//     B: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2p1">2p<sup>1</sup></span>
+//     `,
+//     C: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2p2">2p<sup>2</sup></span>
+//     `,
+//     N: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2p3">2p<sup>3</sup></span>
+//     `,
+//     O: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2p4">2p<sup>4</sup></span>
+//     `,
+//     F: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2p5">2p<sup>5</sup></span>
+//     `,
+//     Ne: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2p6">2p<sup>6</sup></span>
+//     `,
+//     Na: `
+//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+//         <span class="orbital-clickable" data-orbital="2p6">2p<sup>6</sup></span> 
+//         <span class="orbital-clickable" data-orbital="3s1">3s<sup>1</sup></span>
+//     `
+// };
 
 
 const orientation_selection_menu = document.querySelector('#orientation_selection_menu')
 //updating electron configuration label in properties window
 const electron_conf = document.querySelector(".electron_conf");
 function update_electron_conf(key) {
-    electron_conf.innerHTML = electron_configurations[key];
+    electron_conf.innerHTML = elements[key].config;
 }
 //============================================selecting orbital
 let selected_orbital = '';
@@ -371,54 +372,54 @@ function animate() {
     controls.update();
     renderer.render(scene, camera);
 }
-const neutrons_number= [
-        0, 
-        0, 2, 4, 5, 6, 6, 7, 8, 10, 10,       // 1 - 10 (H - Ne)
-        12, 12, 14, 14, 16, 16, 18, 22, 20, 20, // 11 - 20 (Na - Ca)
-        24, 26, 28, 28, 30, 30, 32, 31, 35, 35, // 21 - 30 (Sc - Zn)
-        39, 41, 42, 45, 45, 48, 48, 50, 50, 51, // 31 - 40 (Ga - Zr)
-        52, 54, 55, 57, 58, 60, 61, 64, 66, 69, // 41 - 50 (Nb - Sn)
-        71, 76, 74, 77, 78, 82, 82, 82, 82, 84, // 51 - 60 (Sb - Nd)
-        84, 88, 89, 93, 94, 97, 98, 99, 100, 103, // 61 - 70 (Pm - Yb)
-        104, 106, 108, 110, 111, 114, 115, 117, 118, 121, // 71 - 80 (Lu - Hg)
-        123, 125, 126, 125, 125, 136, 136, 138, 138, 142, // 81 - 90 (Tl - Th)
-        140, 146, 144, 150, 148, 151, 150, 153, 153, 157, // 91 - 100 (Pa - Fm)
-        157, 157, 159, 163, 163, 163, 163, 169, 169, 171, // 101 - 110 (Md - Ds)
-        171, 173, 173, 175, 175, 177, 177, 176  // 111 - 118 (Rg - Og)
-    ];
-const elements = [
-  null,
-  ['H', 'Hydrogen'], ['He', 'Helium'], ['Li', 'Lithium'], ['Be', 'Beryllium'],
-  ['B', 'Boron'], ['C', 'Carbon'], ['N', 'Nitrogen'], ['O', 'Oxygen'],
-  ['F', 'Fluorine'], ['Ne', 'Neon'], ['Na', 'Sodium'], ['Mg', 'Magnesium'],
-  ['Al', 'Aluminium'], ['Si', 'Silicon'], ['P', 'Phosphorus'], ['S', 'Sulfur'],
-  ['Cl', 'Chlorine'], ['Ar', 'Argon'], ['K', 'Potassium'], ['Ca', 'Calcium'],
-  ['Sc', 'Scandium'], ['Ti', 'Titanium'], ['V', 'Vanadium'], ['Cr', 'Chromium'],
-  ['Mn', 'Manganese'], ['Fe', 'Iron'], ['Co', 'Cobalt'], ['Ni', 'Nickel'],
-  ['Cu', 'Copper'], ['Zn', 'Zinc'], ['Ga', 'Gallium'], ['Ge', 'Germanium'],
-  ['As', 'Arsenic'], ['Se', 'Selenium'], ['Br', 'Bromine'], ['Kr', 'Krypton'],
-  ['Rb', 'Rubidium'], ['Sr', 'Strontium'], ['Y', 'Yttrium'], ['Zr', 'Zirconium'],
-  ['Nb', 'Niobium'], ['Mo', 'Molybdenum'], ['Tc', 'Technetium'], ['Ru', 'Ruthenium'],
-  ['Rh', 'Rhodium'], ['Pd', 'Palladium'], ['Ag', 'Silver'], ['Cd', 'Cadmium'],
-  ['In', 'Indium'], ['Sn', 'Tin'], ['Sb', 'Antimony'], ['Te', 'Tellurium'],
-  ['I', 'Iodine'], ['Xe', 'Xenon'], ['Cs', 'Caesium'], ['Ba', 'Barium'],
+// const neutrons_number= [
+//         0, 
+//         0, 2, 4, 5, 6, 6, 7, 8, 10, 10,       // 1 - 10 (H - Ne)
+//         12, 12, 14, 14, 16, 16, 18, 22, 20, 20, // 11 - 20 (Na - Ca)
+//         24, 26, 28, 28, 30, 30, 32, 31, 35, 35, // 21 - 30 (Sc - Zn)
+//         39, 41, 42, 45, 45, 48, 48, 50, 50, 51, // 31 - 40 (Ga - Zr)
+//         52, 54, 55, 57, 58, 60, 61, 64, 66, 69, // 41 - 50 (Nb - Sn)
+//         71, 76, 74, 77, 78, 82, 82, 82, 82, 84, // 51 - 60 (Sb - Nd)
+//         84, 88, 89, 93, 94, 97, 98, 99, 100, 103, // 61 - 70 (Pm - Yb)
+//         104, 106, 108, 110, 111, 114, 115, 117, 118, 121, // 71 - 80 (Lu - Hg)
+//         123, 125, 126, 125, 125, 136, 136, 138, 138, 142, // 81 - 90 (Tl - Th)
+//         140, 146, 144, 150, 148, 151, 150, 153, 153, 157, // 91 - 100 (Pa - Fm)
+//         157, 157, 159, 163, 163, 163, 163, 169, 169, 171, // 101 - 110 (Md - Ds)
+//         171, 173, 173, 175, 175, 177, 177, 176  // 111 - 118 (Rg - Og)
+//     ];
+// const elements = [
+//   null,
+//   ['H', 'Hydrogen'], ['He', 'Helium'], ['Li', 'Lithium'], ['Be', 'Beryllium'],
+//   ['B', 'Boron'], ['C', 'Carbon'], ['N', 'Nitrogen'], ['O', 'Oxygen'],
+//   ['F', 'Fluorine'], ['Ne', 'Neon'], ['Na', 'Sodium'], ['Mg', 'Magnesium'],
+//   ['Al', 'Aluminium'], ['Si', 'Silicon'], ['P', 'Phosphorus'], ['S', 'Sulfur'],
+//   ['Cl', 'Chlorine'], ['Ar', 'Argon'], ['K', 'Potassium'], ['Ca', 'Calcium'],
+//   ['Sc', 'Scandium'], ['Ti', 'Titanium'], ['V', 'Vanadium'], ['Cr', 'Chromium'],
+//   ['Mn', 'Manganese'], ['Fe', 'Iron'], ['Co', 'Cobalt'], ['Ni', 'Nickel'],
+//   ['Cu', 'Copper'], ['Zn', 'Zinc'], ['Ga', 'Gallium'], ['Ge', 'Germanium'],
+//   ['As', 'Arsenic'], ['Se', 'Selenium'], ['Br', 'Bromine'], ['Kr', 'Krypton'],
+//   ['Rb', 'Rubidium'], ['Sr', 'Strontium'], ['Y', 'Yttrium'], ['Zr', 'Zirconium'],
+//   ['Nb', 'Niobium'], ['Mo', 'Molybdenum'], ['Tc', 'Technetium'], ['Ru', 'Ruthenium'],
+//   ['Rh', 'Rhodium'], ['Pd', 'Palladium'], ['Ag', 'Silver'], ['Cd', 'Cadmium'],
+//   ['In', 'Indium'], ['Sn', 'Tin'], ['Sb', 'Antimony'], ['Te', 'Tellurium'],
+//   ['I', 'Iodine'], ['Xe', 'Xenon'], ['Cs', 'Caesium'], ['Ba', 'Barium'],
 //   ['La', 'Lanthanum'], ['Ce', 'Cerium'], ['Pr', 'Praseodymium'], ['Nd', 'Neodymium'],
 //   ['Pm', 'Promethium'], ['Sm', 'Samarium'], ['Eu', 'Europium'], ['Gd', 'Gadolinium'],
 //   ['Tb', 'Terbium'], ['Dy', 'Dysprosium'], ['Ho', 'Holmium'], ['Er', 'Erbium'],
 //   ['Tm', 'Thulium'], ['Yb', 'Ytterbium'], ['Lu', 'Lutetium'], ['Hf', 'Hafnium'],
-  ['Ta', 'Tantalum'], ['W', 'Tungsten'], ['Re', 'Rhenium'], ['Os', 'Osmium'],
-  ['Ir', 'Iridium'], ['Pt', 'Platinum'], ['Au', 'Gold'], ['Hg', 'Mercury'],
-  ['Tl', 'Thallium'], ['Pb', 'Lead'], ['Bi', 'Bismuth'], ['Po', 'Polonium'],
-  ['At', 'Astatine'], ['Rn', 'Radon'], ['Fr', 'Francium'], ['Ra', 'Radium'],
+//   ['Ta', 'Tantalum'], ['W', 'Tungsten'], ['Re', 'Rhenium'], ['Os', 'Osmium'],
+//   ['Ir', 'Iridium'], ['Pt', 'Platinum'], ['Au', 'Gold'], ['Hg', 'Mercury'],
+//   ['Tl', 'Thallium'], ['Pb', 'Lead'], ['Bi', 'Bismuth'], ['Po', 'Polonium'],
+//   ['At', 'Astatine'], ['Rn', 'Radon'], ['Fr', 'Francium'], ['Ra', 'Radium'],
 //   ['Ac', 'Actinium'], ['Th', 'Thorium'], ['Pa', 'Protactinium'], ['U', 'Uranium'],
 //   ['Np', 'Neptunium'], ['Pu', 'Plutonium'], ['Am', 'Americium'], ['Cm', 'Curium'],
 //   ['Bk', 'Berkelium'], ['Cf', 'Californium'], ['Es', 'Einsteinium'], ['Fm', 'Fermium'],
 //   ['Md', 'Mendelevium'], ['No', 'Nobelium'], ['Lr', 'Lawrencium'], ['Rf', 'Rutherfordium'],
-  ['Db', 'Dubnium'], ['Sg', 'Seaborgium'], ['Bh', 'Bohrium'], ['Hs', 'Hassium'],
-  ['Mt', 'Meitnerium'], ['Ds', 'Darmstadtium'], ['Rg', 'Roentgenium'], ['Cn', 'Copernicium'],
-  ['Nh', 'Nihonium'], ['Fl', 'Flerovium'], ['Mc', 'Moscovium'], ['Lv', 'Livermorium'],
-  ['Ts', 'Tennessine'], ['Og', 'Oganesson']
-];
+//   ['Db', 'Dubnium'], ['Sg', 'Seaborgium'], ['Bh', 'Bohrium'], ['Hs', 'Hassium'],
+//   ['Mt', 'Meitnerium'], ['Ds', 'Darmstadtium'], ['Rg', 'Roentgenium'], ['Cn', 'Copernicium'],
+//   ['Nh', 'Nihonium'], ['Fl', 'Flerovium'], ['Mc', 'Moscovium'], ['Lv', 'Livermorium'],
+//   ['Ts', 'Tennessine'], ['Og', 'Oganesson']
+// ];
 
 const neutrons_number_label = document.querySelector('.neutrons_number')
 const protons_number_label = document.querySelector('.protons_number')
@@ -431,14 +432,14 @@ function change_title(element) {
 }
 //==========================================================SELECTING ELEMENTS
 for(let el_index = 1; el_index < elements.length; el_index += 1) {
-    const el = elements[el_index]
-    document.getElementById(el[0]).addEventListener('click', () => {
+    const el = elements[el_index];
+    document.getElementById(el.symbol).addEventListener('click', () => {
         render_el(el_index)
         dialog.close();
-        change_title(el[1]);
-        update_electron_conf(el[0])
+        change_title(el.name);
+        update_electron_conf(el_index)
         protons_number_label.textContent = el_index;
-        neutrons_number_label.textContent = neutrons_number[el_index]
+        neutrons_number_label.textContent = el.neutrons;
     });
 }
 
@@ -447,7 +448,7 @@ function render_el(number) {
     electrons.clear();
     scene.clear();
     orbitals_list.clear();
-    arrange_particles(number, neutrons_number[number])
+    arrange_particles(number, elements[number].neutrons)
     const orbitals_max = [
         { name: '1s', max: 2 },
         { name: '2s', max: 2 }, { name: '2p', max: 6 },
@@ -498,5 +499,5 @@ function render_el(number) {
 } 
 
 render_el(1)
-update_electron_conf("H")
+update_electron_conf(1)
 animate()

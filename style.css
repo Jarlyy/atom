@@ -77,8 +77,9 @@ html, body {
     cursor: pointer;
 }
 #selection_menu {
-    height: 595px;
-    width:540px;
+    height: fit-content;
+    width:fit-content;
+    padding: 20px;
     background-color: black;
     color: #8383e6;
     border-radius: 20px;
@@ -89,14 +90,32 @@ html, body {
     left: auto;
     top:20px;
     place-items: center;  
+    box-sizing: border-box;
 }
 #selection_menu[open] {
+    }
+#main_table {
     display: grid;
+    overflow-y: auto;
+    max-height: calc(100vh - 40px);
+    width:max-content;
+    gap:10px;
     grid-template-columns: repeat(10,1fr);
+    margin:0 auto;
+    box-sizing: border-box;
+
+}
+#additional_table {
+    display:grid;
+    width:max-content;
+    margin:10px auto 0 auto;
+    gap:10px;
+    box-sizing: border-box;
+    grid-template-columns: repeat(14,1fr);
 }
 
 .menu_el {
-    width: 45px;
+    width: 60px;
     height: 45px;
     display:flex;
     justify-content: center;
@@ -106,7 +125,22 @@ html, body {
     
     cursor: pointer;
     background-color: black;
-    border-radius: 15%;
+    border-radius: 10px;
+    border:2px solid #265299;
+    color: white;
+}
+.menu_el_add {
+    width: 40px;
+    height: 45px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+
+    
+    cursor: pointer;
+    background-color: black;
+    border-radius: 10px;
     border:2px solid #265299;
     color: white;
 }
@@ -161,4 +195,6 @@ html, body {
 }
 #orientation_selection_menu {
     margin:10px;
+    color:white;
+    background-color: black;
 }
