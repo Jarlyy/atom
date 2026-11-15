@@ -162,8 +162,16 @@ html, body {
     text-align:center;
     display:flex;
     align-items: center;
+    height:fit-content;
     flex-wrap: wrap;
     gap:6px;
+}
+.electron_conf_wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height:fit-content;
+    align-items: center;
 }
 .deselect_button:hover {
     cursor:pointer;

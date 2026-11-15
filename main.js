@@ -44,6 +44,7 @@ const active_electron_color = "#4a92ff"
 const inactive_orbital_color = "#373737"
 const inactive_electron_color = "#3e4760"
 
+
 let electrons = new Map();
 
 
@@ -58,7 +59,7 @@ function create_particle(posx = 0, posy = 0, posz = 0, color) {
 }
 function create_electron(curve, start) {
     const sphere = new THREE.SphereGeometry(1);
-    const mat = new THREE.MeshBasicMaterial({ color: electron_color });
+    const mat = new THREE.MeshBasicMaterial({ color: electron_color, transparent: true, opacity: 1});
     const particle = new THREE.Mesh(sphere, mat);
     // const startPoint = curve.getPointAt(start);
     // particle.position.set(startPoint.x, startPoint.y, startPoint.z);
@@ -72,17 +73,18 @@ function create_electron(curve, start) {
 function create_s_orbital(radius = 2, axis = 'y') {
     const curve_raw = new THREE.ArcCurve(0,0,radius);
     let points_rotated = [];
+    const points_number = 32 * radius
     if(axis == 'x') {
-        for(let point of curve_raw.getPoints(64)) {
+        for(let point of curve_raw.getPoints(points_number)) {
             points_rotated.push(new THREE.Vector3(0, point.y, point.x));
         }
     }
     else if(axis =='z'){
-        for(let point of curve_raw.getPoints(64)) {
+        for(let point of curve_raw.getPoints(points_number)) {
             points_rotated.push(new THREE.Vector3(point.x, point.y, 0));
         }
     } else {
-        for(let point of curve_raw.getPoints(64)) {
+        for(let point of curve_raw.getPoints(points_number)) {
             points_rotated.push(new THREE.Vector3(point.x, 0, point.y))
         }
     }
@@ -90,8 +92,8 @@ function create_s_orbital(radius = 2, axis = 'y') {
     //const geometry = new THREE.BufferGeometry().setFromPoints(points_rotated)
     const geometry = new LineGeometry();
     geometry.setFromPoints(points_rotated)
-    const mat = new LineMaterial({ color: orbital_color,linewidth: 5});
-    const orbital = new Line2(geometry, mat);
+    const orbital_mat = new LineMaterial({ color: orbital_color, linewidth: 3});
+    const orbital = new Line2(geometry, orbital_mat);
     const speed = 0.02 /radius;
     scene.add(orbital);
     console.log('+')
@@ -101,8 +103,11 @@ function create_s_orbital(radius = 2, axis = 'y') {
 
 
 
-function create_p_orbital(len, axis = 'x') {
-    const width = len * 0.4
+function create_p_orbital(total_len, axis = 'x') {
+
+    const width = Math.sqrt(total_len) * 1.8;
+    const len = total_len - width
+//len * 0.4 - 10//len * 0.4 
     const beta = Math.acos(width/len)
     const alpha = 2 * Math.PI - 2 * beta
     const height = width * Math.sin(beta);
@@ -147,10 +152,10 @@ function create_p_orbital(len, axis = 'x') {
     const line2 = new THREE.LineCurve3(points_rotated_2[points_rotated_2.length-1], points_rotated[0])
     const points_all = points_rotated.concat(line1.getPoints(100)).concat(points_rotated_2).concat(line2.getPoints(100))
     const curve = new THREE.CatmullRomCurve3(points_all)
-    const mat = new LineMaterial({ color: orbital_color, linewidth: 5});
+    const orbital_mat = new LineMaterial({ color: orbital_color, linewidth: 3});
     const curve_points = curve.getSpacedPoints(100*len)
     const geometry = new LineGeometry().setFromPoints(curve_points);
-    const orbital = new Line2(geometry, mat);
+    const orbital = new Line2(geometry, orbital_mat);
     scene.add(orbital);
     
     return [curve_points, 0.02/len,orbital];
@@ -214,60 +219,6 @@ function getRandomInt(min, max) {
 let orbitals_list = new Map();
 
 
-// const electron_configurations = {
-//     H: `
-//         <span class="orbital-clickable" data-orbital="1s1">1s<sup>1</sup></span>
-//     `,
-//     He: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span>
-//     `,
-//     Li: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s1">2s<sup>1</sup></span>
-//     `,
-//     Be: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span>
-//     `,
-//     B: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2p1">2p<sup>1</sup></span>
-//     `,
-//     C: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2p2">2p<sup>2</sup></span>
-//     `,
-//     N: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2p3">2p<sup>3</sup></span>
-//     `,
-//     O: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2p4">2p<sup>4</sup></span>
-//     `,
-//     F: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2p5">2p<sup>5</sup></span>
-//     `,
-//     Ne: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2p6">2p<sup>6</sup></span>
-//     `,
-//     Na: `
-//         <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
-//         <span class="orbital-clickable" data-orbital="2p6">2p<sup>6</sup></span> 
-//         <span class="orbital-clickable" data-orbital="3s1">3s<sup>1</sup></span>
-//     `
-// };
-
-
 const orientation_selection_menu = document.querySelector('#orientation_selection_menu')
 //updating electron configuration label in properties window
 const electron_conf = document.querySelector(".electron_conf");
@@ -282,16 +233,16 @@ properties_wraper.addEventListener('click', (event) => {
         selected_orbital = orbital_name.slice(0,2)
         orientation_selection_menu.innerHTML = ''
         orientation_selection_menu.add(new Option('all','all'))
-        if (orbital_name[1] == 's' || orbital_name[2] == '1') {
+        if (orbital_name[1] == 's' || orbital_name.slice(2) == '1') {
             orientation_selection_menu.classList.add('hidden')
         }else{
             orientation_selection_menu.classList.remove('hidden')
             
                 orientation_selection_menu.add(new Option('x', 'x'));
-            if (parseInt(orbital_name[2]) >= 2) {
-                orientation_selection_menu.add(new Option('y', 'z'));
-            }if (parseInt(orbital_name[2])>=3) {
-                orientation_selection_menu.add(new Option('z', 'y'));
+            if (parseInt(orbital_name.slice(2)) >= 2) {
+                orientation_selection_menu.add(new Option('y', 'y'));
+            }if (parseInt(orbital_name.slice(2))>=3) {
+                orientation_selection_menu.add(new Option('z', 'z'));
             }
             if (orbital_name[1] == 'd' || orbital_name[1] == 'f') {
                 if (parseInt(orbital_name[2])>=4) {
@@ -305,7 +256,6 @@ properties_wraper.addEventListener('click', (event) => {
         for(const [orb,name] of orbitals_list) {
             if(name.slice(0,2)==orbital_name.slice(0,2)) {
                 orb.material.color.set(active_orbital_color);
-                console.log("set color")
             }
             else{
                 orb.material.color.set(inactive_orbital_color)
@@ -314,9 +264,13 @@ properties_wraper.addEventListener('click', (event) => {
         for(const [electron,array] of electrons) {
             if(array[3].slice(0,2) == orbital_name.slice(0,2)) {
                 electron.material.color.set(active_electron_color)
+                electron.material.opacity = 1;
+                electron.material.needsUpdate = true;
             }
             else{
                 electron.material.color.set(inactive_electron_color)
+                electron.material.opacity = 0.5
+                electron.material.needsUpdate = true;
             }
             
         }
@@ -335,10 +289,12 @@ orientation_selection_menu.addEventListener('change', (event) => {
     for(const [electron,array] of electrons) {
             if(array[3] == selected_orbital+selected_orientation || (selected_orientation == 'all' && array[3].slice(0,2) == selected_orbital)) {
                 electron.material.color.set(active_electron_color)
-            }
+                electron.material.opacity = 1;
+                electron.material.needsUpdate = true;           }
             else{
                 electron.material.color.set(inactive_electron_color)
-            }
+                 electron.material.opacity = 0.5
+                electron.material.needsUpdate = true;           }
             
         }
 })
@@ -348,6 +304,8 @@ deselect_button.addEventListener("click", () => {
     selected_orbital = ''
     for(const [electron,array] of electrons) {
         electron.material.color.set(electron_color);
+        electron.material.opacity = 1;
+        electron.material.needsUpdate = true;
     }
     for(const [orb,] of orbitals_list) {
         orb.material.color.set(orbital_color)
@@ -372,54 +330,7 @@ function animate() {
     controls.update();
     renderer.render(scene, camera);
 }
-// const neutrons_number= [
-//         0, 
-//         0, 2, 4, 5, 6, 6, 7, 8, 10, 10,       // 1 - 10 (H - Ne)
-//         12, 12, 14, 14, 16, 16, 18, 22, 20, 20, // 11 - 20 (Na - Ca)
-//         24, 26, 28, 28, 30, 30, 32, 31, 35, 35, // 21 - 30 (Sc - Zn)
-//         39, 41, 42, 45, 45, 48, 48, 50, 50, 51, // 31 - 40 (Ga - Zr)
-//         52, 54, 55, 57, 58, 60, 61, 64, 66, 69, // 41 - 50 (Nb - Sn)
-//         71, 76, 74, 77, 78, 82, 82, 82, 82, 84, // 51 - 60 (Sb - Nd)
-//         84, 88, 89, 93, 94, 97, 98, 99, 100, 103, // 61 - 70 (Pm - Yb)
-//         104, 106, 108, 110, 111, 114, 115, 117, 118, 121, // 71 - 80 (Lu - Hg)
-//         123, 125, 126, 125, 125, 136, 136, 138, 138, 142, // 81 - 90 (Tl - Th)
-//         140, 146, 144, 150, 148, 151, 150, 153, 153, 157, // 91 - 100 (Pa - Fm)
-//         157, 157, 159, 163, 163, 163, 163, 169, 169, 171, // 101 - 110 (Md - Ds)
-//         171, 173, 173, 175, 175, 177, 177, 176  // 111 - 118 (Rg - Og)
-//     ];
-// const elements = [
-//   null,
-//   ['H', 'Hydrogen'], ['He', 'Helium'], ['Li', 'Lithium'], ['Be', 'Beryllium'],
-//   ['B', 'Boron'], ['C', 'Carbon'], ['N', 'Nitrogen'], ['O', 'Oxygen'],
-//   ['F', 'Fluorine'], ['Ne', 'Neon'], ['Na', 'Sodium'], ['Mg', 'Magnesium'],
-//   ['Al', 'Aluminium'], ['Si', 'Silicon'], ['P', 'Phosphorus'], ['S', 'Sulfur'],
-//   ['Cl', 'Chlorine'], ['Ar', 'Argon'], ['K', 'Potassium'], ['Ca', 'Calcium'],
-//   ['Sc', 'Scandium'], ['Ti', 'Titanium'], ['V', 'Vanadium'], ['Cr', 'Chromium'],
-//   ['Mn', 'Manganese'], ['Fe', 'Iron'], ['Co', 'Cobalt'], ['Ni', 'Nickel'],
-//   ['Cu', 'Copper'], ['Zn', 'Zinc'], ['Ga', 'Gallium'], ['Ge', 'Germanium'],
-//   ['As', 'Arsenic'], ['Se', 'Selenium'], ['Br', 'Bromine'], ['Kr', 'Krypton'],
-//   ['Rb', 'Rubidium'], ['Sr', 'Strontium'], ['Y', 'Yttrium'], ['Zr', 'Zirconium'],
-//   ['Nb', 'Niobium'], ['Mo', 'Molybdenum'], ['Tc', 'Technetium'], ['Ru', 'Ruthenium'],
-//   ['Rh', 'Rhodium'], ['Pd', 'Palladium'], ['Ag', 'Silver'], ['Cd', 'Cadmium'],
-//   ['In', 'Indium'], ['Sn', 'Tin'], ['Sb', 'Antimony'], ['Te', 'Tellurium'],
-//   ['I', 'Iodine'], ['Xe', 'Xenon'], ['Cs', 'Caesium'], ['Ba', 'Barium'],
-//   ['La', 'Lanthanum'], ['Ce', 'Cerium'], ['Pr', 'Praseodymium'], ['Nd', 'Neodymium'],
-//   ['Pm', 'Promethium'], ['Sm', 'Samarium'], ['Eu', 'Europium'], ['Gd', 'Gadolinium'],
-//   ['Tb', 'Terbium'], ['Dy', 'Dysprosium'], ['Ho', 'Holmium'], ['Er', 'Erbium'],
-//   ['Tm', 'Thulium'], ['Yb', 'Ytterbium'], ['Lu', 'Lutetium'], ['Hf', 'Hafnium'],
-//   ['Ta', 'Tantalum'], ['W', 'Tungsten'], ['Re', 'Rhenium'], ['Os', 'Osmium'],
-//   ['Ir', 'Iridium'], ['Pt', 'Platinum'], ['Au', 'Gold'], ['Hg', 'Mercury'],
-//   ['Tl', 'Thallium'], ['Pb', 'Lead'], ['Bi', 'Bismuth'], ['Po', 'Polonium'],
-//   ['At', 'Astatine'], ['Rn', 'Radon'], ['Fr', 'Francium'], ['Ra', 'Radium'],
-//   ['Ac', 'Actinium'], ['Th', 'Thorium'], ['Pa', 'Protactinium'], ['U', 'Uranium'],
-//   ['Np', 'Neptunium'], ['Pu', 'Plutonium'], ['Am', 'Americium'], ['Cm', 'Curium'],
-//   ['Bk', 'Berkelium'], ['Cf', 'Californium'], ['Es', 'Einsteinium'], ['Fm', 'Fermium'],
-//   ['Md', 'Mendelevium'], ['No', 'Nobelium'], ['Lr', 'Lawrencium'], ['Rf', 'Rutherfordium'],
-//   ['Db', 'Dubnium'], ['Sg', 'Seaborgium'], ['Bh', 'Bohrium'], ['Hs', 'Hassium'],
-//   ['Mt', 'Meitnerium'], ['Ds', 'Darmstadtium'], ['Rg', 'Roentgenium'], ['Cn', 'Copernicium'],
-//   ['Nh', 'Nihonium'], ['Fl', 'Flerovium'], ['Mc', 'Moscovium'], ['Lv', 'Livermorium'],
-//   ['Ts', 'Tennessine'], ['Og', 'Oganesson']
-// ];
+
 
 const neutrons_number_label = document.querySelector('.neutrons_number')
 const protons_number_label = document.querySelector('.protons_number')
@@ -448,6 +359,7 @@ function render_el(number) {
     electrons.clear();
     scene.clear();
     orbitals_list.clear();
+    const n = number
     arrange_particles(number, elements[number].neutrons)
     const orbitals_max = [
         { name: '1s', max: 2 },
@@ -464,11 +376,12 @@ function render_el(number) {
         let orientations = []
         if(number > 0) {
             if (orb.name[1] == 's') {
-                size = parseInt(orb.name[0]) * 10 + 5
+                size = parseInt(orb.name[0]) * 20 + n*0.25 
                 orientations = ['y']
                 create_orbital = (size,orientation) => create_s_orbital(size,orientation);
             }else if(orb.name[1]=='p') {
-                size = parseInt(orb.name[0]) * 10
+                size = parseInt(orb.name[0]) * 20 + n*0.25 + 3
+                //if(orb.name[0] == '2') size = 40 + n*0.25
                 orientations = ['x','y','z']
                 create_orbital = (size,orientation) => create_p_orbital(size,orientation);
             }
@@ -477,19 +390,20 @@ function render_el(number) {
             for(const orient of orientations) {
                 if(electrons_to_add <=0) break;
                 const l = create_orbital(size,orient)
-                const points_array = l[0]
-                const speed = l[1]
+                const [points_array, speed, orbital] = l 
                 l.push(orient)
-                electrons.set(create_electron(), [points_array,0, speed,orb.name + orient])
+                const start_point = Math.random()
+                l.push(start_point)
+                electrons.set(create_electron(), [points_array,start_point,speed,orb.name + orient])
                 local_orbitals.push(l)
-                orbitals_list.set(l[2], orb.name+orient)
+                orbitals_list.set(orbital, orb.name+orient)
                 electrons_to_add -= 1
                 number -= 1
                 
             }
             for(const orbital of local_orbitals) {
                 if (electrons_to_add <= 0) break;
-                electrons.set(create_electron(), [orbital[0],0.5,orbital[1],orb.name+orbital[3]])
+                electrons.set(create_electron(), [orbital[0],(orbital[4]+0.5)%1,orbital[1],orb.name+orbital[3]])
                 number -=1
                 electrons_to_add -= 1
             }
