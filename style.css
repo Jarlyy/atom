@@ -53,7 +53,8 @@ html, body {
     padding: 20px;
 }
 .hidden {
-    display: none;
+    visibility: hidden;
+    pointer-events: none;
 }
 .properties_window {
     border-radius: 30px;
@@ -123,8 +124,12 @@ html, body {
 } 
 .electron_conf {
     font-size:18px;
+    margin-right:20px;
     text-align:center;
-    margin-top:15px;
+    display:flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap:6px;
 }
 .deselect_button:hover {
     cursor:pointer;
@@ -153,4 +158,7 @@ html, body {
     border: 4px solid #265299;
     border-radius: 20px;
     padding: 15px;
+}
+#orientation_selection_menu {
+    margin:10px;
 }

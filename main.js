@@ -22,20 +22,6 @@ function resize() {
 window.addEventListener('resize', resize);
 resize()
 const properties_wraper = document.querySelector('.properties_window_wraper')
-// const show_properties_button = document.querySelector('#show_properties_button')
-// document.querySelector('#properties_hide_button').addEventListener("click", () => {
-//     properties_wraper.classList.add('hidden')
-//     resize();
-//     show_properties_button.classList.remove("hidden")
-//     //show_properties_button.style.display = "block";
-// });
-// show_properties_button.addEventListener('click',() => {
-//     properties_wraper.classList.remove('hidden')
-//     show_properties_button.classList.add("hidden")
-//     //show_properties_button.style.display = 'none';
-//     //resize();
-//     requestAnimationFrame(() => resize());
-// })
 const resizeObserver = new ResizeObserver(() => {
     resize();
 });
@@ -227,70 +213,96 @@ function getRandomInt(min, max) {
 let orbitals_list = new Map();
 
 
-
 const electron_configurations = {
     H: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>1</sup></span>
+        <span class="orbital-clickable" data-orbital="1s1">1s<sup>1</sup></span>
     `,
     He: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span>
     `,
     Li: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>1</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s1">2s<sup>1</sup></span>
     `,
     Be: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>2</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span>
     `,
     B: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p">2p<sup>1</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2p1">2p<sup>1</sup></span>
     `,
     C: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p">2p<sup>2</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2p2">2p<sup>2</sup></span>
     `,
     N: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p">2p<sup>3</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2p3">2p<sup>3</sup></span>
     `,
     O: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p">2p<sup>4</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2p4">2p<sup>4</sup></span>
     `,
     F: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p">2p<sup>5</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2p5">2p<sup>5</sup></span>
     `,
     Ne: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p">2p<sup>6</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2p6">2p<sup>6</sup></span>
     `,
     Na: `
-        <span class="orbital-clickable" data-orbital="1s">1s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2s">2s<sup>2</sup></span> 
-        <span class="orbital-clickable" data-orbital="2p">2p<sup>6</sup></span> 
-        <span class="orbital-clickable" data-orbital="3s">3s<sup>1</sup></span>
+        <span class="orbital-clickable" data-orbital="1s2">1s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2s2">2s<sup>2</sup></span> 
+        <span class="orbital-clickable" data-orbital="2p6">2p<sup>6</sup></span> 
+        <span class="orbital-clickable" data-orbital="3s1">3s<sup>1</sup></span>
     `
 };
+
+
+const orientation_selection_menu = document.querySelector('#orientation_selection_menu')
 //updating electron configuration label in properties window
 const electron_conf = document.querySelector(".electron_conf");
 function update_electron_conf(key) {
     electron_conf.innerHTML = electron_configurations[key];
 }
 //============================================selecting orbital
+let selected_orbital = '';
 properties_wraper.addEventListener('click', (event) => {
     if (event.target.classList.contains('orbital-clickable')) {
-        const orbitalName = event.target.dataset.orbital; 
+        const orbital_name = event.target.dataset.orbital; 
+        selected_orbital = orbital_name.slice(0,2)
+        orientation_selection_menu.innerHTML = ''
+        orientation_selection_menu.add(new Option('all','all'))
+        if (orbital_name[1] == 's' || orbital_name[2] == '1') {
+            orientation_selection_menu.classList.add('hidden')
+        }else{
+            orientation_selection_menu.classList.remove('hidden')
+            
+                orientation_selection_menu.add(new Option('x', 'x'));
+            if (parseInt(orbital_name[2]) >= 2) {
+                orientation_selection_menu.add(new Option('y', 'z'));
+            }if (parseInt(orbital_name[2])>=3) {
+                orientation_selection_menu.add(new Option('z', 'y'));
+            }
+            if (orbital_name[1] == 'd' || orbital_name[1] == 'f') {
+                if (parseInt(orbital_name[2])>=4) {
+                    orientation_selection_menu.add(new Option('u','u'))
+                }if (parseInt(orbital_name[2]) >= 5) {
+                    orientation_selection_menu.add(new Option('w','w'))
+                }
+            }
+            
+        }
         for(const [orb,name] of orbitals_list) {
-            if(name==orbitalName) {
+            if(name.slice(0,2)==orbital_name.slice(0,2)) {
                 orb.material.color.set(active_orbital_color);
                 console.log("set color")
             }
@@ -299,7 +311,7 @@ properties_wraper.addEventListener('click', (event) => {
             }
         }
         for(const [electron,array] of electrons) {
-            if(array[3] == orbitalName) {
+            if(array[3].slice(0,2) == orbital_name.slice(0,2)) {
                 electron.material.color.set(active_electron_color)
             }
             else{
@@ -309,8 +321,30 @@ properties_wraper.addEventListener('click', (event) => {
         }
     }
 });
+orientation_selection_menu.addEventListener('change', (event) => {
+    const selected_orientation = event.target.value;
+    for(const [orb,name] of orbitals_list) {
+            if(name == selected_orbital + selected_orientation || (selected_orientation == 'all' && name.slice(0,2) == selected_orbital)) {
+                orb.material.color.set(active_orbital_color);
+            }
+            else{
+                orb.material.color.set(inactive_orbital_color)
+            }
+        }
+    for(const [electron,array] of electrons) {
+            if(array[3] == selected_orbital+selected_orientation || (selected_orientation == 'all' && array[3].slice(0,2) == selected_orbital)) {
+                electron.material.color.set(active_electron_color)
+            }
+            else{
+                electron.material.color.set(inactive_electron_color)
+            }
+            
+        }
+})
 const deselect_button = document.querySelector(".deselect_button")
 deselect_button.addEventListener("click", () => {
+    orientation_selection_menu.classList.add('hidden')
+    selected_orbital = ''
     for(const [electron,array] of electrons) {
         electron.material.color.set(electron_color);
     }
@@ -412,7 +446,7 @@ for(let el_index = 1; el_index < elements.length; el_index += 1) {
 function render_el(number) {
     electrons.clear();
     scene.clear();
-    
+    orbitals_list.clear();
     arrange_particles(number, neutrons_number[number])
     const orbitals_max = [
         { name: '1s', max: 2 },
@@ -444,16 +478,17 @@ function render_el(number) {
                 const l = create_orbital(size,orient)
                 const points_array = l[0]
                 const speed = l[1]
-                electrons.set(create_electron(), [points_array,0, speed,orb.name])
+                l.push(orient)
+                electrons.set(create_electron(), [points_array,0, speed,orb.name + orient])
                 local_orbitals.push(l)
-                orbitals_list.set(l[2], orb.name)
+                orbitals_list.set(l[2], orb.name+orient)
                 electrons_to_add -= 1
                 number -= 1
                 
             }
             for(const orbital of local_orbitals) {
                 if (electrons_to_add <= 0) break;
-                electrons.set(create_electron(), [orbital[0],0.5,orbital[1],orb.name])
+                electrons.set(create_electron(), [orbital[0],0.5,orbital[1],orb.name+orbital[3]])
                 number -=1
                 electrons_to_add -= 1
             }
