@@ -4,6 +4,7 @@ import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import {elements} from './data.js';
+import { randInt } from 'three/src/math/MathUtils.js';
 //initial setup
 const mycanvas = document.querySelector('#canvas');
 const wraper = mycanvas.parentElement;
@@ -68,15 +69,26 @@ function create_electron(curve, start) {
 }
 
 
-
+let show_clouds = false;
+let selected_el = 1
+const show_clouds_checkbox = document.getElementById('show_clouds_checkbox')
+show_clouds_checkbox.addEventListener("change", (event) => {
+    show_clouds = !show_clouds
+    render_el(selected_el)
+})
 //===========================ORBITALS======================
 function create_s_orbital(radius = 2, axis = 'y') {
     const curve_raw = new THREE.ArcCurve(0,0,radius);
+    const random_rotation = new THREE.Euler(
+        (Math.random()-0.5) * (Math.PI *2/ radius), 
+        (Math.random()-0.5) * (Math.PI *2/ radius),
+        (Math.random()-0.5) * (Math.PI *2/ radius)
+        )
     let points_rotated = [];
     const points_number = 32 * radius
     if(axis == 'x') {
         for(let point of curve_raw.getPoints(points_number)) {
-            points_rotated.push(new THREE.Vector3(0, point.y, point.x));
+            points_rotated.push(new THREE.Vector3(0, point.y, point.x).applyEuler(random_rotation));
         }
     }
     else if(axis =='z'){
@@ -85,7 +97,7 @@ function create_s_orbital(radius = 2, axis = 'y') {
         }
     } else {
         for(let point of curve_raw.getPoints(points_number)) {
-            points_rotated.push(new THREE.Vector3(point.x, 0, point.y))
+            points_rotated.push(new THREE.Vector3(point.x, 0, point.y).applyEuler(random_rotation))
         }
     }
     const curve = new THREE.CatmullRomCurve3(points_rotated,true);
@@ -96,6 +108,9 @@ function create_s_orbital(radius = 2, axis = 'y') {
     const orbital = new Line2(geometry, orbital_mat);
     const speed = 0.02 /radius;
     scene.add(orbital);
+    if(show_clouds) {
+        scene.add(new THREE.Mesh(new THREE.SphereGeometry(radius),new THREE.MeshBasicMaterial({color:"#8a92ff", transparent: true, opacity: 0.15, depthWrite: false})))
+    }
     console.log('+')
     points_rotated = curve.getSpacedPoints(100*radius)
     return [points_rotated, speed, orbital];
@@ -356,6 +371,7 @@ for(let el_index = 1; el_index < elements.length; el_index += 1) {
 
 /////////////////////////////////rendering elements
 function render_el(number) {
+    selected_el = number
     electrons.clear();
     scene.clear();
     orbitals_list.clear();
@@ -376,11 +392,11 @@ function render_el(number) {
         let orientations = []
         if(number > 0) {
             if (orb.name[1] == 's') {
-                size = parseInt(orb.name[0]) * 20 + n*0.25 
+                size = parseInt(orb.name[0]) * 10 + n*0.25 
                 orientations = ['y']
                 create_orbital = (size,orientation) => create_s_orbital(size,orientation);
             }else if(orb.name[1]=='p') {
-                size = parseInt(orb.name[0]) * 20 + n*0.25 + 3
+                size = parseInt(orb.name[0]) * 10 + n*0.25 + 3
                 //if(orb.name[0] == '2') size = 40 + n*0.25
                 orientations = ['x','y','z']
                 create_orbital = (size,orientation) => create_p_orbital(size,orientation);
