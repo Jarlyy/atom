@@ -44,6 +44,7 @@ const active_orbital_color = "#73c795"
 const active_electron_color = "#4a92ff"
 const inactive_orbital_color = "#373737"
 const inactive_electron_color = "#3e4760"
+const orbital_width = 4;
 
 
 let electrons = new Map();
@@ -79,11 +80,11 @@ show_clouds_checkbox.addEventListener("change", (event) => {
 //===========================ORBITALS======================
 function create_s_orbital(radius = 2, axis = 'y') {
     const curve_raw = new THREE.ArcCurve(0,0,radius);
-    const random_rotation = new THREE.Euler(
-        (Math.random()-0.5) * (Math.PI *2/ radius), 
-        (Math.random()-0.5) * (Math.PI *2/ radius),
-        (Math.random()-0.5) * (Math.PI *2/ radius)
-        )
+    // const random_rotation = new THREE.Euler(
+    //     (Math.random()-0.5) * (Math.PI *2/ radius), 
+    //     (Math.random()-0.5) * (Math.PI *2/ radius),
+    //     (Math.random()-0.5) * (Math.PI *2/ radius)
+    //     )
     let points_rotated = [];
     const points_number = 32 * radius
     if(axis == 'x') {
@@ -97,14 +98,14 @@ function create_s_orbital(radius = 2, axis = 'y') {
         }
     } else {
         for(let point of curve_raw.getPoints(points_number)) {
-            points_rotated.push(new THREE.Vector3(point.x, 0, point.y).applyEuler(random_rotation))
+            points_rotated.push(new THREE.Vector3(point.x, 0, point.y))//.applyEuler(random_rotation))
         }
     }
     const curve = new THREE.CatmullRomCurve3(points_rotated,true);
     //const geometry = new THREE.BufferGeometry().setFromPoints(points_rotated)
     const geometry = new LineGeometry();
     geometry.setFromPoints(points_rotated)
-    const orbital_mat = new LineMaterial({ color: orbital_color, linewidth: 3});
+    const orbital_mat = new LineMaterial({ color: orbital_color, linewidth: orbital_width});
     const orbital = new Line2(geometry, orbital_mat);
     const speed = 0.02 /radius;
     scene.add(orbital);
@@ -167,7 +168,7 @@ function create_p_orbital(total_len, axis = 'x') {
     const line2 = new THREE.LineCurve3(points_rotated_2[points_rotated_2.length-1], points_rotated[0])
     const points_all = points_rotated.concat(line1.getPoints(100)).concat(points_rotated_2).concat(line2.getPoints(100))
     const curve = new THREE.CatmullRomCurve3(points_all)
-    const orbital_mat = new LineMaterial({ color: orbital_color, linewidth: 3});
+    const orbital_mat = new LineMaterial({ color: orbital_color, linewidth: orbital_width});
     const curve_points = curve.getSpacedPoints(100*len)
     const geometry = new LineGeometry().setFromPoints(curve_points);
     const orbital = new Line2(geometry, orbital_mat);
